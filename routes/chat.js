@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-
+const {getProductSearch} = require('../utils/scraper')
 const { isAuthenticated } = require('../middlewares/authMiddleware');
 const {sendChat} = require('../utils/sendChat')
 
@@ -12,11 +12,16 @@ router.post('/prompt', isAuthenticated, async(req, res)=>{
     const param = {count:10, statement:statement}
     try {
         const result = await sendChat(param)
+        console.log(result)
         const user = await UserRegistration.findOneAndUpdate({username:username}, { $push: { history:result} }, { new: true } )
+        const items = result.split(',');
+        console.log(items);
+        const output = await getProductSearch(items[0])
+        console.log(output)
         // Use Scrapper for scapping the data
         // Use Scrapper from the utils folder
         // return the data
-        res.send("sent prompt")
+        res.send(output);
     } catch (error) {
         console.log(error)
         res.status(500).send("Internal Server Error")
