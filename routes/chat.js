@@ -17,11 +17,23 @@ router.post('/prompt', isAuthenticated, async(req, res)=>{
         const items = result.split(',');
         console.log(items);
         const output = await getProductSearch(items[0])
-        console.log(output)
+        const output1 = await getProductSearch(items[1])
+        const output2 = await getProductSearch(items[2])
+        const arr = [];
+        for(let i =0; i<output.length;i++){
+            let item = output[i];
+            let item1 = output1[i];
+            let item2 = output2[i];
+            arr.push([item, item1, item2])
+        }
+
+
+
+        console.log(arr)
         // Use Scrapper for scapping the data
         // Use Scrapper from the utils folder
         // return the data
-        res.send(output);
+        res.send(arr);
     } catch (error) {
         console.log(error)
         res.status(500).send("Internal Server Error")
