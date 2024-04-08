@@ -40,6 +40,32 @@ router.post('/prompt', isAuthenticated, async(req, res)=>{
     }
 })
 
+router.post('/product_data', async(req, res)=>{
+    const statement = req.body.prompt
+    const param = {count:10, statement:statement}
+    try {
+        const result = await sendChat(param)
+        console.log(result)
+        const items = result.split(',');
+        console.log(items);
+        const output = await getProductSearch(items[0])
+        const output1 = await getProductSearch(items[1])
+        const output2 = await getProductSearch(items[2])
+        const arr = [];
+        
+        arr.push({"name": items[0], "res" :output}, {"name": items[1], "res" :output1}, {"name": items[2], "res" :output2})
+
+        console.log(arr)
+        // Use Scrapper for scapping the data
+        // Use Scrapper from the utils folder
+        // return the data
+        res.send(arr);
+    } catch (error) {
+        console.log(error)
+        res.status(500).send("Internal Server Error")
+    }
+})
+
 
 router.get('/', isAuthenticated, async(req, res)=>{
     const username = req.username
@@ -54,7 +80,7 @@ router.get('/', isAuthenticated, async(req, res)=>{
 
 router.get("/get-chat", (req, res) => {
     res.send(`
-        <form method="POST" action="/chat/prompt">
+        <form method="POST" action="/chat/product_data">
         <input type="text" name="prompt" placeholder="prompt" />
         <input type="submit" value="Submit">
     </form>

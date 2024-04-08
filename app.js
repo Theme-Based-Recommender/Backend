@@ -41,7 +41,7 @@ const chat = require("./routes/chat");
 
 
 
-
+// app.get("/", (req, res) => res.send("Express on Vercel"));
 app.use('/auth', login);
 app.use('/profile', profile);
 app.use('/chat', chat)
