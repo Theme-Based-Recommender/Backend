@@ -6,14 +6,14 @@ const {sendChat} = require('../utils/sendChat')
 
 const UserRegistration = require("../models/UserRegistration");
 
-router.post('/prompt', isAuthenticated, async(req, res)=>{
-    const username = req.username
+router.post('/prompt', async(req, res)=>{
+    // const username = req.username
     const statement = req.body.prompt
     const param = {count:10, statement:statement}
     try {
         const result = await sendChat(param)
         console.log(result)
-        const user = await UserRegistration.findOneAndUpdate({username:username}, { $push: { history:result} }, { new: true } )
+        //const user = await UserRegistration.findOneAndUpdate({username:username}, { $push: { history:result} }, { new: true } )
         const items = result.split(',');
         console.log(items);
         const output = await getProductSearch(items[0])
