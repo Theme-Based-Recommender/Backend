@@ -32,9 +32,10 @@ const getAmazonProductSearch = async (items) => {
             item2.push(json[i][item][1])
             item3.push(json[i][item][2])
             item4.push(json[i][item][3])
-            bundleArr.push([item1, item2, item3, item4])
+            
         }
       }
+      bundleArr.push(item1, item2, item3, item4)
       arr.bundles=bundleArr
       for(let i=0; i<5;i++){
         for(let item in json[i]){
