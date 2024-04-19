@@ -3,10 +3,29 @@ var router = express.Router();
 const {getProductSearch} = require('../utils/scraper')
 const { isAuthenticated } = require('../middlewares/authMiddleware');
 const {sendChat} = require('../utils/sendChat')
+const {getAmazonProductSearch} = require('../utils/amazonScraper')
 
 const UserRegistration = require("../models/UserRegistration");
 
 router.post('/prompt', async(req, res)=>{
+    // const username = req.username
+    const statement = req.body.prompt
+    const param = {count:10, statement:statement}
+    try {
+        const result = await sendChat(param)
+        console.log(result)
+        //const user = await UserRegistration.findOneAndUpdate({username:username}, { $push: { history:result} }, { new: true } )
+        const items = result.split(',');
+        console.log(items);
+        const output = await getAmazonProductSearch(items)
+        res.send(output);
+    } catch (error) {
+        console.log(error)
+        res.status(500).send("Internal Server Error")
+    }
+})
+
+router.post('/scraper', async(req, res)=>{
     // const username = req.username
     const statement = req.body.prompt
     const param = {count:10, statement:statement}
@@ -60,7 +79,7 @@ router.get('/', isAuthenticated, async(req, res)=>{
 
 router.get("/get-chat", (req, res) => {
     res.send(`
-        <form method="POST" action="/chat/product_data">
+        <form method="POST" action="/chat/prompt">
         <input type="text" name="prompt" placeholder="prompt" />
         <input type="submit" value="Submit">
     </form>
