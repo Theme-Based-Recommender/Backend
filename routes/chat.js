@@ -3,21 +3,24 @@ var router = express.Router();
 const {getProductSearch} = require('../utils/scraper')
 const { isAuthenticated } = require('../middlewares/authMiddleware');
 const {sendChat} = require('../utils/sendChat')
-const {getAmazonProductSearch} = require('../utils/amazonScraper')
+const {getAmazonProductSearch} = require('../utils/googleScraper')
+const {query} = require("../utils/chatLlama")
 
 const UserRegistration = require("../models/UserRegistration");
-
+// const defResult = ['laptop', 'smartphone', 'headphones']
 router.post('/prompt', async(req, res)=>{
     // const username = req.username
     const statement = req.body.prompt
     const param = {count:10, statement:statement}
     try {
         const result = await sendChat(param)
-        console.log(result)
-        //const user = await UserRegistration.findOneAndUpdate({username:username}, { $push: { history:result} }, { new: true } )
-        const items = result.split(',');
-        console.log(items);
-        const output = await getAmazonProductSearch(items)
+        // const result = await query({"inputs": `List 4 single word product names as list that could be relevant for: ${statement}`})
+        // console.log(result)
+        // //const user = await UserRegistration.findOneAndUpdate({username:username}, { $push: { history:result} }, { new: true } )
+        // const items = result
+        const output = await getAmazonProductSearch(result)
+        console.log(output);
+            
         res.send(output);
     } catch (error) {
         console.log(error)

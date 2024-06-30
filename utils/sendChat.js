@@ -1,28 +1,29 @@
-const OpenAI = require("openai")
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 async function sendChat(prompt) {
   const {count, statement} = prompt
-  const messages = [{ role: "user", content: `Give me only list of ${count} number of products to buy from amazon for the theme given in the next statement` }]
-  messages.push({role: "user", content:statement})
-  const completion = await openai.chat.completions.create({
-    messages: messages,
-    model: "gpt-3.5-turbo",
+  const messages = [{ role: "user", parts: [{text:"List 10 single word product names as list that could be relevant for:"}]}]
+  const chat = model.startChat({
+    history: messages,
+    generationConfig: {
+      maxOutputTokens: 100,
+      temperature: 0.5
+    },
   });
-  return replaceNumbersAndNewlines(completion.choices[0].message.content)
+  const result = await chat.sendMessage(statement);
+  console.log(typeof(result.response.text()));
+  return extractProductNames(result.response.text())
 }
 
-
-function replaceNumbersAndNewlines(inputString) {
-  // Replace numbers followed by a dot and space with an empty string
-  const withoutNumbers = inputString.replace(/\d+\.\s/g, "");
-
-  // Replace newline characters with a space
-  const withoutNewlines = withoutNumbers.replace(/\n/g, ",");
-
-  return withoutNewlines;
+function extractProductNames(text) {
+  // Split the text into lines
+  const lines = text.split(/\n/);
+  // Filter lines to include only those that start with a number and a period
+  const productLines = lines.filter(line => /^\d+\./.test(line));
+  // Remove asterisks, numbers, periods, and trim each product line
+  const cleanedProductNames = productLines.map(line => line.replace(/^\d+\.\s*\**|\**\s*$/g, '').trim());
+  return cleanedProductNames;
 }
-
 
 module.exports = {sendChat}

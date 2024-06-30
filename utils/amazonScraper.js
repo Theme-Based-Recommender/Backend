@@ -14,9 +14,9 @@ const getAmazonProductSearch = async (items) => {
         body: JSON.stringify({items:data}),
       });
       
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      // if (!response.ok) {
+      //   throw new Error('Network response was not ok');
+      // }
   
       const json = await response.json();
 
@@ -42,6 +42,7 @@ const getAmazonProductSearch = async (items) => {
             arr.products.push({"name": item, "res" :json[i][item]})
         }
       }
+      console.log(JSON.stringify(arr))
       return arr
     } catch (error) {
       console.error('Error fetching data:', error);
